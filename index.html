@@ -11,14 +11,21 @@
       #messages { list-style-type: none; margin: 0; padding: 0; }
       #messages li { padding: 5px 10px; }
       #messages li:nth-child(odd) { background: #eee; }
-      #messages { margin-bottom: 40px }
+      #messages { margin-bottom: 40px; }
+      #users {width:20%; float: right; padding-left: 2%}
+      #messageBox{width: 80%; float: left;}
     </style>
   </head>
   <body>
+  <div id ="messageBox">
     <ul id="messages"></ul>
     <form action="">
       <input id="m" autocomplete="off" /><button>Send</button>
     </form>
+  </div>
+    <div id="users">
+      Hi
+    </div>
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
@@ -31,9 +38,40 @@
           return false;
         });
         socket.on('chat message', function(msg){
-          $('#messages').append($('<li>').text(msg));
+            var messageObj = JSON.parse(msg);
+          $('#messages').append($('<li>').text(messageObj.uname+": "+messageObj.message));
           window.scrollTo(0, document.body.scrollHeight);
         });
+        socket.on('users update', function(userList){
+            console.log(userList);
+            var userArray=userList.split(",");
+            $('#users').html(makeUL(userArray));
+        })
+
+          socket.on('user left', function(lostPerson){
+              $('#messages').append($('<li>').text(lostPerson+" has disconnected"));
+          })
+          socket.on('user connect', function(newPerson){
+              $('#messages').append($('<li>').text(newPerson+" has joined the chat"));
+          })
+          function makeUL(array) {
+              // Create the list element:
+              var list = document.createElement('ul');
+
+              for(var i = 0; i < array.length; i++) {
+                  // Create the list item:
+                  var item = document.createElement('li');
+
+                  // Set its contents:
+                  item.appendChild(document.createTextNode(array[i]));
+
+                  // Add it to the list:
+                  list.appendChild(item);
+              }
+
+              // Finally, return the constructed list:
+              return list;
+          }
       });
     </script>
   </body>
