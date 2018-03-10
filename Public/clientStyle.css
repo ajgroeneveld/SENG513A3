@@ -3,9 +3,12 @@
 html, body {
     font: 13px Helvetica, Arial;
     height:90%;
-    background-color: lightblue;
+    background-color: #40284B;
     margin: 0;
     padding: 0;
+}
+h1{
+    color: #D2C2DD;
 }
 
 form {
@@ -25,7 +28,7 @@ form input {
 
 form button {
     width: 7%;
-    background: lightyellow;
+    background: #D2C2DD;
     border: none;
     padding: 10px;
 }
@@ -42,12 +45,10 @@ form button {
 }
 
 #messages li:nth-child(odd) {
-    background: #eee;
+    background: #D2C2DD;
 }
 
-#messages {
-    margin-bottom: 40px;
-}
+
 
 #users {
     bottom: 0;
@@ -60,6 +61,7 @@ form button {
     padding: 5px 10px;
 
 }
+
 
 .row-container {
     display: flex;
@@ -96,4 +98,5 @@ aside {
     position: relative;
     height: 75%;
     background-color: white;
+    bottom: 0;
 }

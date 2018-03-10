@@ -16,11 +16,14 @@ app.get('/', function(req, res){
 });
 
 io.on('connection', function(socket){
+    //Operations for when a message comes in
   socket.on('chat message', function(msg){
       if (msg.startsWith("/nick ")) {
+          var tempName=people[socket.id];
           people[socket.id]=msg.substr(6, msg.length - 6).trim();
           socket.emit('get name', people[socket.id]);
           UpdatePeople(people);
+          io.emit('username change', tempName+","+people[socket.id]);
       }
       else if (msg.startsWith("/nickcolor ")) {
           color[socket.id]=msg.substr(11, msg.length - 11).trim();
@@ -28,8 +31,8 @@ io.on('connection', function(socket){
       }
       else{
           console.log(msg);
-
           var date = new Date();
+          //Create a JSON object of the info
           var messageObj='{'+'' +
               '"uname":"'+people[socket.id]+'", ' +
               '"message":"'+msg+'",' +
@@ -37,26 +40,27 @@ io.on('connection', function(socket){
               '"color":"'+color[socket.id]+
               '"}';
           console.log(messageObj);
+          //Emit that object
           io.emit('chat message', messageObj);
+          //Save to memory BUT only the 200 most recent
           if (messagingHistory.length > 200){
               messagingHistory.shift();
           }
           messagingHistory.push(messageObj);}
 
   });
-
+//Create names and join up
   socket.on('join', function(){
       console.log("user joined");
       people[socket.id]="User"+parseInt(Object.keys(people).length+1);
       color[socket.id]="#000000";
-     // socket.emit("messaging history", messagingHistory);
-      UpdatePeople(people);
-      io.emit('user connect', people[socket.id]);
       socket.emit('get name', people[socket.id]);
       socket.emit('set messages', messagingHistory);
+      io.emit('user connect', people[socket.id]);
+      UpdatePeople(people);
     });
 
-
+//Disconnect message, delete person and users
   socket.on('disconnect', function(){
       console.log('user disconnected');
       io.emit('user left', people[socket.id]);
@@ -71,7 +75,7 @@ http.listen(port, function(){
   console.log('listening on *:' + port);
 });
 
-
+//A list of all people in the chat
 function UpdatePeople(people){
     var people_emit="";
     for(i in people) {
@@ -81,7 +85,7 @@ function UpdatePeople(people){
     io.emit('users update', people_emit);
 
 }
-
+//Just doing time
 function FormatTime(date) {
     var hour = date.getHours();
     var minutes = date.getMinutes();
